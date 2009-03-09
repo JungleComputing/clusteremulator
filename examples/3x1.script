@@ -1,0 +1,51 @@
+#
+# Example script for the cluster emulator.
+# This script emulates the following environment:
+# - 3 clusters of 1 node each
+# - different RTT and bandwidth between all clusters
+# - 100 MB/s incoming and outgoing capacity per node and cluster
+
+#
+# Define three clusters (ca, cb, and cc) with 2 nodes each.
+#
+defineCluster  0  ca
+defineCluster  1  cb
+defineCluster  2  cc
+
+#
+# Set the incoming and outgoing capacity of all nodes.
+#
+setAllCapacityIn 100 MB/s
+setAllCapacityOut 100 MB/s
+
+#
+# Set the incoming and outgoing capacity of all clusters.
+#
+setCapacityIn c.* 100 MB/s
+setCapacityOut c.* 100 MB/s
+
+#
+# Set the delay between all clusters. 
+#
+
+# ca <-> cb RTT = 40 ms
+setDelay ca cb 20 ms
+setDelay cb ca 20 ms
+
+# ca <-> cc RTT = 80 ms
+setDelay ca cc 40 ms
+setDelay cc ca 40 ms
+
+# cb <-> cc RTT = 120 ms
+setDelay cb cc 60 ms
+setDelay cc cb 60 ms
+
+#
+# Set the bandwidth between all clusters
+#
+setBandwidth ca cb   200 KB/s
+setBandwidth ca cc   400 KB/s
+setBandwidth cb ca   800 KB/s
+setBandwidth cb cc  1600 KB/s
+setBandwidth cc ca  3200 KB/s
+setBandwidth cc cb  6400 KB/s

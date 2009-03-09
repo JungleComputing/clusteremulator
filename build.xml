@@ -1,0 +1,52 @@
+<project name="ClusterEmulator" basedir="." default="build">
+
+    <property name="version" value="0.1"/>
+    <property name="jarfile" value="clusteremulator-${version}.jar"/>
+    <property name="srcdir" value="src"/>
+    <property name="builddir" value="build"/>
+    <property name="externaldir" value="external"/>
+    <property name="libdir" value="lib"/>
+	
+    <target name="build" depends="jar">
+        <copy todir="${libdir}">
+            <fileset dir="${externaldir}">
+                <include name="*.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile">
+		<delete failonerror="false" dir="${libdir}" />
+		<mkdir dir="${libdir}" />
+
+		<delete failonerror="false" file="${libdir}/${jarfile}" />
+		<jar jarfile="${libdir}/${jarfile}">
+			<fileset dir="${builddir}">
+				<include name="**/*.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile">
+		<delete failonerror="false" dir="${builddir}" />
+		<mkdir dir="${builddir}" />
+	    
+		<javac 
+			srcdir="${srcdir}" 
+			destdir="${builddir}"
+			target="1.5"
+			debug="true">
+			<classpath>
+		    	<fileset dir="${externaldir}">
+		   			<include name="**/*.jar"/>
+    			</fileset>
+    		</classpath>
+		</javac>		
+	</target>
+			
+	<target name="clean" description="Clean the distribution file(s)">
+		<delete failonerror="false" dir="${builddir}"/>
+        <delete failonerror="false" dir="${libdir}"/>
+	</target>
+		
+</project>

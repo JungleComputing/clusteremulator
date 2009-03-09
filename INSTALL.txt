@@ -1,0 +1,37 @@
+============================
+ClusterEmulator installation
+============================
+
+-----
+Build
+-----
+
+Build by typing 'ant'.
+
+A 'lib/' directory will be created containing a JAR file with all the cluster 
+emulator code.
+
+
+---------------------
+Linux Traffic Control
+---------------------
+
+You must be able to execute the following command on the cluster nodes: 
+
+   sudo /sbin/tc
+   
+If you do not have sufficient right to this, then contact your local system 
+administrator. 
+
+
+----------------------
+Ibis Portability Layer
+----------------------
+
+The application 'clusteremulator.test.PingPongTest' uses the Ibis Portability 
+Layer (IPL) to communicate. The cluster emulator source tree only includes the 
+IPL API to allow compilation. To actually run the application you also need 
+an IPL implementation, which can be downloaded from http://www.cs.vu.nl/ibis.
+
+The environment variable IPL_HOME should point to the installation directory
+of the Ibis Portability Layer.

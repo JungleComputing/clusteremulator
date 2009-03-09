@@ -1,0 +1,70 @@
+#
+# Example script for the cluster emulator.
+# This script emulates the following environment:
+# - 3 clusters (ca, cb, and cc) of 2, 4, and 8 nodes, respectively
+# - all nodes in ca and cb have a 100 Mbit network card
+# - all nodes in cc have a 1 Gbit network card
+# - all clusters have an 1 Gbit access link
+# - random bandwidth and delay between all clusters
+# - each 10 seconds, the bandwidth and delay of the link between
+#   ca and cb change to new random values.
+
+# Define the three clusters. Cluster 'ca' contains two nodes (with rank 0 and 1),
+# cluster 'cb' contains four nodes (rank 3 t/m 5) and cluster 'cc' contains 8 
+# nodes (rank 6 t/m 13).
+#
+defineCluster  0 1  ca
+defineCluster  2 3 4 5  cb
+defineCluster  6 7 8 9 10 11 12 13  cc
+
+#
+# Set the incoming and outgoing capacity of the nodes.
+#
+setCapacityIn  0 1 2 3 4 5  100 Mbit/s
+setCapacityOut 0 1 2 3 4 5  100 Mbit/s
+setCapacityIn  6 7 8 9 10 11 12 13  1 Gbit/s
+setCapacityOut  6 7 8 9 10 11 12 13  1 Gbit/s
+
+#
+# Set the incoming and outgoing capacity of all clusters. Java regular 
+# expressions are used to set this for all clusters simulteneously.
+#
+setCapacityIn  c.*  1 Gbit/s
+
+#
+# Initialize the seed value of the pseudo-random generator, so each run
+# of the emulator uses the same fluctuations. 
+#
+initRandom  12345 
+
+#
+# Set a random one-way delay between all clusters, chosen uniformly between 
+# 20 ms and 200 ms. The round-trip time between clusters will thus vary from
+# 40 ms to 400 ms, and the one-way delay in both directions will very likely 
+# be different.
+#
+setDelay c.* c.* random 20 ms 200 ms
+
+#
+# Set a random one-way bandwidth between clusters, chosen uniformly between
+# 100 KB/s and 10 MB/s.
+#
+setBandwidth c.* c.* random 100 KB/s 10 MB/s
+
+#
+# Repeat the remaining lines forever
+#
+forever
+
+#
+# Sleep 10 seconds
+#
+sleep 10 sec
+
+#
+# Set the bandwidth and delay between ca and cb to new random values
+#
+setDelay ca cb random 20 ms 200 ms
+setDelay cb ca random 20 ms 200 ms
+setBandwidth ca cb random 100 KB/s 10 MB/s
+setBandwidth cb ca random 100 KB/s 10 MB/s

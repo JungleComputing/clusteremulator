@@ -1,0 +1,218 @@
+========================
+Emulation scripts README
+========================
+
+This file describes the layout and syntax of the scripts are used by the
+cluster emulator. A script specifies the environment that the cluster emulator 
+has to emulate.
+ 
+---------
+Contents:
+---------
+
+1. Structure
+2. Virtual clusters
+3. Delay and bandwidth
+4. Regular expressions
+5. Units
+6. Random values
+7. Local capacity
+8. Dynamic scripts
+9. Zero bandwidth and delay?
+
+
+------------
+1. Structure
+------------
+
+Each emulation script file has more or less the same structure:
+
+1. Define the layout of the clusters (this cannot change anymore)
+2. Define the delay and bandwidth between clusters, and the incoming and
+   outgoing capacity of clusters and the individual nodes in clusters.
+3. Possibly include a part at the end that is looped continuously.
+
+Each line in the script files contains at most one command. Commands are not
+case sensitive. Commands and their arguments are separated by one or more spaces. 
+Lines starting with a '#' contain comments. Empty lines are ignored.
+
+
+-------------------
+2. Virtual clusters
+-------------------
+
+All nodes in the environment have a 'rank', a zero-based number. Each virtual 
+cluster in the environment has a name (strings without spaces). A script always 
+starts by defining which nodes are located in which clusters. Example:
+
+   defineCluster 0 1 2 3  cluster_a
+   
+Defines a cluster with the name 'cluster_a' that contains four nodes, with ranks
+0 t/m 3. Later commands can refer to these ranks and names. 
+
+
+----------------------
+3. Delay and bandwidth
+----------------------
+
+Assume we defined two virtual clusters, 'cluster_a' and 'cluster_b'. We can 
+then specify the network characteristics between these clusters. For example, 
+a bandwidth from cluster_a to cluster_b of 500 kilobytes per second is specified
+with the command:
+
+   setBandwidth cluster_a cluster_b 500 KB/s
+
+The one-way delay between clusters can be set with the 'setDelay' command, for
+example to 50 milliseconds:
+
+   setDelay cluster_a cluster_b 50 ms
+
+The values in the reverse direction has to be set explicitly, and can be 
+different. 
+
+
+----------------------
+4. Regular expressions
+----------------------
+
+The cluster names in the commands are actually Java regular expressions, which 
+makes is possible to specify many values with one command. For example, if all 
+cluster names start with 'cluster_', the bandwidth between *all* pairs of 
+clusters can be set to 500 kilobytes per second using:
+
+   setBandwidth cluster_.* cluster_.* 500 KB/s
+   
+See the documentation of the java.util.regex.Pattern class for more information
+on the syntax of regular expressions.
+
+
+--------
+5. Units
+--------
+
+Values in the emulation script commands (e.g. delay and bandwidth values) are 
+always followed by a unit. The units are parsed in the class 
+clusteremulator.util.Convert. Units are not case sensitive. 
+
+The following units are recognized:
+
+    For time: 
+         s, sec, seconds                    (seconds)
+         ms, msec, millisec, milliseconds   (milliseconds)
+
+    For amounts of data:
+        B, bytes                                      (bytes)
+        KB, KiB, kbyte, kbytes, kilobyte, kilobytes   (kilobyte = 1024 bytes)
+        MB, MiB, mbyte, mbytes, megabyte, megabytes   (megabyte = 1024 kilobytes)
+        GB, GiB, gbyte, gbytes, gigabyte, gigabytes   (gigabyte = 1024 megabyte)
+        kbit, kbits, kilobits                         (kilobit  = 1000 bytes)
+        mbit, mbits, megabits                         (megabit  = 1000 kilobits)
+        gbit, gbits, gigabits                         (gigabit  = 1000 megabits) 
+
+Note that the 'byte' units use powers of 2, while the 'bit' unit use powers of 
+10. This mimics the common usage of these units in networking equipment. 
+
+
+----------------
+6. Random values
+----------------
+
+The delay and bandwidth values can also be chosen uniformly at random from a 
+certain range. For example, we can set the bandwidth between cluster_a and 
+cluster_b to a random value between 100 KB/s and 2 MB/s using this command:
+
+   setBandwidth cluster_a cluster_b random 100 KB/s 2 MB/s
+   
+The values are determined by a pseudo-random number generator (the class 
+java.util.Random). By default, this class is initialized without a specific seed
+value, which will generates different values in each run of the cluster 
+emulator. However, it can be desirable to use the *same* randomly chosen 
+values in each run, e.g. to verify multiple protocols under the same conditions.
+The following command can therefore be used to initialize the random number
+generator with a certain seed value (in this case, '123456'):
+
+   initRandom 123456
+   
+This command should be placed before other commands that use random values.    
+
+
+-----------------
+7. Local capacity
+-----------------
+
+Besides delay and bandwidth between virtual clusters, the cluster emulator can
+also emulate local capacity of virtual clusters and the wide-area network 
+interface of nodes inside these clusters. Local capacity can be incoming or
+outgoing. The outgoing local capacity of a cluster is the bandwidth that is 
+shared by all traffic sent _from_ that cluster. Similarly, the incoming local 
+capacity of a cluster if that bandwidth that is shared by all traffic _to_ that
+cluster. Such a local capacity is caused by the access link with which a cluster
+is connected to the WAN (for home users, this can be speed of their ADSL link). 
+Each node can also have a local capacity (incoming andoutgoing), which is 
+usually caused by its network card. For example, if nodes have a 100Mbit network
+card and are connected to a gigabit backbone, their network card will actually 
+limit the achievable bandwidth.
+
+The incoming and outgoing local capacity can be set with the commands 
+'setCapacityIn' and 'setCapacityOut', respectively. This command can be used for
+both virtual clusters and individual nodes, although they cannot be mixed in the
+same command. For example, the outgoing local capacity of cluster_a can be set to
+100 MB/s using this command:
+
+   setCapacityOut cluster_a 100 MB/s
+   
+Regular expressions can be used to set the capacity of multiple clusters 
+simultaneously. Individual nodes are identified by their ranks. For example, 
+the incoming capacity of nodes 0 t/m 4 can be set to 10 MB/s using this command:
+
+  setCapacityIn 0 1 2 3 4 10 MB/s
+  
+For nodes, no regular expressions can be used. However, two special command
+are available to set the incoming and outgoing capacity of *all* nodes, 
+respectively: 'setAllCapacityIn' and 'setAllCapacityOut'. For example, the 
+outgoing local capacity of all nodes can be set to 100 megabit per second using
+this command: 
+
+  setAllCapacityIn 100 Mbit/s
+
+
+------------------
+8. Dynamic scripts
+------------------
+
+The cluster emulator can also emulate dynamic changes in the environment. The 
+application is started on all application nodes when the emulation script on 
+all nodes (including the hub nodes) has been finished or pauzes. From that 
+moment on, the script interpreter keeps on running and executing new commands
+in the background. When certain network characteristics are changed later on,
+the Linux Traffic Control settings are also updated to emulate the new 
+changed environment.
+
+A script can be pauzed for a certain amount of time with the 'sleep' command.
+For example, the following command pauzes the execution of the script for 
+30 seconds:
+
+   sleep 30
+   
+Furthermore, the last part of the script can be looped continuously. All 
+commands after the 'forever' command are repeated until the application 
+terminates. With multiple 'forever' commands, only the last one is effective.
+The script examples/dynamic.script demonstrates the 'forever' command.
+It is commendable to place at least one 'sleep' command after the forever 
+command, otherwise the repetition of the last part of the script will place a 
+very high load on all nodes.
+
+
+----------------------------
+9. Zero bandwidth and delay?
+----------------------------
+
+A script MUST specify local capacity values for all clusters and nodes, and
+bandwidth values between each pair of nodes. Not specifying some values will 
+leave them zero, which is not accepted by the Linux Traffic Control commands.    
+
+If local capacity is of no interest, it can be set to an arbitrary large value.
+
+However, it is possible to disable the emulation of delay by setting certain 
+Java properties. See README.txt for more information.
+ 

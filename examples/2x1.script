@@ -1,0 +1,37 @@
+#
+# Example script for the cluster emulator.
+# This script emulates the following environment:
+# - 2 clusters of 1 node each
+# - different delay and bandwidth between clusters in both directions
+# - 100 MB/s incoming and outgoing capacity per node and cluster
+
+
+# Define two clusters (ca and cb) with 1 node each.
+#
+defineCluster  0  ca
+defineCluster  1  cb
+
+#
+# Set the incoming and outgoing capacity of all nodes.
+#
+setAllCapacityIn 100 MB/s
+setAllCapacityOut 100 MB/s
+
+#
+# Set the incoming and outgoing capacity of the clusters. Java regular 
+# expressions are used to set this for both clusters simulteneously.
+#
+setCapacityIn c.* 100 MB/s
+setCapacityOut c.* 100 MB/s
+
+#
+# Set the one-way delay between the clusters.
+#
+setDelay ca cb 30 ms
+setDelay cb ca 60 ms
+
+#
+# Set the one-way bandwidth between clusters.
+#
+setBandwidth ca cb 1 MB/s
+setBandwidth cb ca 5 MB/s
