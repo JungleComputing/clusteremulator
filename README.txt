@@ -48,14 +48,16 @@ All delay and bandwidth values can be different in both directions.
 SmartSockets
     The cluster emulator uses the SmartSockets library for custom routing of
     network traffic. The emulator can therefore be used with any program that 
-    communicates via SmartSockets.
+    communicates via SmartSockets. More information about SmartSockets can
+    be found at http://www.cs.vu.nl/ibis/smartsockets.html.
     
 Linux Traffic Control
     The actual emulation of delay and bandwidth is done using Linux Traffic 
     Control (LTC). The cluster in which the emulator is run should therefore run
     a Linux version with LTC enabled. You must be able to execute the command
     "sudo /sbin/tc". Contact your local system administrator to arrange 
-    sufficient rights, if necessary,
+    sufficient rights, if necessary. More information about Linux Traffic 
+    Control can be found at http://lartc.org/.
 
 
 --------------------
