@@ -18,6 +18,13 @@ server_addr=fs0.das3.cs.vu.nl
 ibis_server_port=44661
 poolinfo_server_port=44662
 
+# Check if you have created a ~/.sge_epilog file (see README.txt)
+if [ ! -x $USER/.sge_epilog ]; then
+    echo "Please create an executable file '~/.sge_epilog' to cleanup LTC settings."
+    echo "For more information, see README.txt, Section 6 'Cleaning up'."
+    exit 1
+fi 
+
 prun -no-panda -1 -t 15:00 \
     java $nodes \
     -cp $IPL_HOME/lib/'*':$bindir/../lib/'*' \
