@@ -11,9 +11,9 @@ Contents
 3. Emulation scripts
 4. Running your application in the cluster emulator
 5. Ibis locations
-6. Testing the emulator with the PingPongTest application
-7. SmartSockets visualization
-8. Cleaning up
+6. Cleaning up
+7. Testing the emulator with the PingPongTest application
+8. SmartSockets visualization
 9. Configuration properties
 
 
@@ -133,9 +133,40 @@ then the ibis.location property on the node that gets rank 0 will be set to
 "node0@cluster_a". Each node in an Ibis application can therefore inspect the
 Location object to discover which cluster it is part of. 
 
+ 
+--------------
+6. Cleaning up
+--------------
+
+The cluster emulator adds various LTC settings to the Myrinet interfaces of the
+nodes used in a run. When the application is finished, the cluster emulator
+deletes all LTC settings in a JVM shutdown hook (see 
+java.lang.Runtime.addShutdownHook). However, this mechanism fails if the 
+application is forcibly killed.
+
+Checking whether LTC settings have already been set can be done with the
+script bin/tc-info.sh. When no special LTC settings have been set, the output
+on DAS-3 nodes will look like:
+
+   $ ./tc-info.sh 
+   qdisc pfifo_fast 0: dev eth0 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+   qdisc pfifo_fast 0: dev myri0 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+   
+When something else is printed, some interface cards have special LTC settings.
+Cleaning all settings can be done with the script 'bin/tc-clean.sh'.
+
+On the DAS-3, you can and should let the SGE scheduler remove all LTC settings 
+automatically when your jobs terminate. This is done by creating an executable 
+file '~/.sge_epilog' that performs the same commands as tc-clean.sh does:
+
+   $ cp bin/tc-clean.sh ~/.sge_epilog
+   $ chmod +x ~/.sge_epilog
+
+Please perform these steps before you use the cluster emulator on the DAS-3.
+
 
 ---------------------------------------------------------
-6. Testing the emulator with the PingPongTest application
+7. Testing the emulator with the PingPongTest application
 ---------------------------------------------------------
 
 The example application 'PingPongTest' measures the round-trip time and 
@@ -181,7 +212,7 @@ Take the following steps to run the PingPongTest on fs0.das3.cs.vu.nl:
 
 
 -----------------------------
-7. SmartSockets visualization
+8. SmartSockets visualization
 -----------------------------
 
 The SmartSockets library can visualize the current network of hub and 
@@ -221,33 +252,6 @@ PingPongTest application:
 
    The address at the end must be the same as the one seen in the output of the
    cluster emulator.
-
- 
---------------
-8. Cleaning up
---------------
-
-The cluster emulator adds various LTC settings to the Myrinet interfaces of the
-nodes used in a run. When the application is finished, the cluster emulator
-deletes all LTC settings in a JVM shutdown hook (see 
-java.lang.Runtime.addShutdownHook). However, this mechanism fails if the 
-application is forcibly killed.
-
-Checking whether LTC settings have already been set can be done with the
-script bin/tc-info.sh. When no special LTC settings have been set, the output
-on DAS-3 nodes will look like:
-
-   $ ./tc-info.sh 
-   qdisc pfifo_fast 0: dev eth0 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
-   qdisc pfifo_fast 0: dev myri0 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
-   
-When something else is printed, some interface cards have special LTC settings.
-Cleaning all settings can be done with the script 'bin/tc-clean.sh'. 
-When you explicitly killed your application and the cluster emulator it ran in,
-you should whether the nodes it ran on have lingereing LTC settings left. Please
-clean them to not hamper other DAS-3 users.
-
-A more foolproof cleanup mechanism is currently being worked on. 
 
  
 ---------------------------   
