@@ -35,7 +35,7 @@ of traffic shaping. This way, the cluster emulator can emulate:
 - Local capacity per virtual cluster, i.e. the bandwidth of the link between 
   a cluster and the WAN that is shared by all traffic from and to that cluster.
 
-- Local capacity' per node, i.e. the bandwidth of the wide-area network
+- Local capacity per node, i.e. the bandwidth of the wide-area network
   interface of cluster nodes.
   
 All delay and bandwidth values can be different in both directions.
@@ -92,8 +92,8 @@ required nodes is N + C.
 
 Each node needs to know what its purpose is (running part of the application,
 or running a SmartSockets hub). This is done via a central PoolInfo server that 
-gives every node a zero-based during startup. The first N nodes become regular
-application nodes, while the last C nodes run the SmartSockets hubs. The 
+gives every node a zero-based rank during startup. The first N nodes become 
+regular application nodes, while the last C nodes run the SmartSockets hubs. The 
 PoolInfo server is also used to synchronize all nodes at runtime. This server 
 has to be started before starting your application, using the script 
 'bin/poolinfo-server.sh'.
@@ -145,7 +145,7 @@ java.lang.Runtime.addShutdownHook). However, this mechanism fails if the
 application is forcibly killed.
 
 Checking whether LTC settings have already been set can be done with the
-script bin/tc-info.sh. When no special LTC settings have been set, the output
+script 'bin/tc-info.sh'. When no special LTC settings have been set, the output
 on DAS-3 nodes will look like:
 
    $ ./tc-info.sh 
@@ -175,7 +175,7 @@ bandwidth between all application nodes. It uses Ibis to communicate.
 Take the following steps to run the PingPongTest on fs0.das3.cs.vu.nl:
 
 1. Follow the instructions in INSTALL.txt to compile the cluster emulator code
-   and arrange/install thel dependencies (Linux Traffic Control and the 
+   and arrange/install the dependencies (Linux Traffic Control and the 
    Ibis Portability Layer) 
 
 2. Start three shells (shell 1, 2, and 3) and 'cd' to the cluster emulator 
@@ -279,7 +279,7 @@ with Java properties. The following is possible:
     clusteremulator.hub_port = <number>
     
 - Change the buffer size (in bytes) on the SmartSockets hubs (default: 2097152)
-  Very large streams may need larger buffers to SmartSockets to keep up.
+  Very large streams may need larger buffers for SmartSockets to keep up.
      clusteremulator.hubrouted_buffer = <size>
 
 - Change the network preference used by SmartSockets. 
