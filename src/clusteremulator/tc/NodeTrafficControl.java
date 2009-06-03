@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import clusteremulator.gauge.EmulatedGauge;
-import clusteremulator.util.Convert;
 
 public class NodeTrafficControl extends AbstractTrafficControl {
 
@@ -48,8 +47,8 @@ public class NodeTrafficControl extends AbstractTrafficControl {
         }
 
         if (firstTime || outCap != prevOutCap) {
-            logger.info("Emulating outgoing capacity of " + myRank + ": " + 
-                    Convert.round(outCap, 2) + " bytes/sec");
+            String f = "Emulating outgoing capacity of %1$d: %2$.2f bytes/sec";
+            logger.info(String.format(f, myRank, outCap)); 
 
             if (firstTime) {
                 // add the root HTB qdisc

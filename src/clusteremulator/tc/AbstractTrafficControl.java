@@ -19,8 +19,7 @@ public abstract class AbstractTrafficControl implements Observer, Config {
 
     private static final int MTU = 9000;
     private static final int KERNEL_HZ = 250;
-    protected static final int FRACTION_DIGITS = 3;
-
+    
     private Logger logger = LoggerFactory.getLogger(AbstractTrafficControl.class);
 
     private EmulatedGauge gauge;
@@ -105,11 +104,11 @@ public abstract class AbstractTrafficControl implements Observer, Config {
         if (bytesPerSec < 1024 * 1024) {
             // less then 1 MB/s, express it in kilobytes/sec
             double kbytesPerSecond = Convert.bytesPerSecToKBytesPerSec(bytesPerSec);
-            return Convert.round(kbytesPerSecond, FRACTION_DIGITS) + "kbps";
+            return String.format("%1$.3fkbps", kbytesPerSecond);
         } else {
             // at least 1 MB/s, express in megabytes/sec
             double mbytesPerSecond = Convert.bytesPerSecToMBytesPerSec(bytesPerSec);
-            return Convert.round(mbytesPerSecond, FRACTION_DIGITS) + "mbps";
+            return String.format("%1$.3fmbps", mbytesPerSecond);
         }
     }
 
