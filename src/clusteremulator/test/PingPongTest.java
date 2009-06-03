@@ -155,8 +155,8 @@ public class PingPongTest {
                             double kb = Convert.bytesToKBytes(bytes);
                             double sec = Convert.millisecToSec(time);
                             
-                            logger.info("Bandwidth " + srcName + " -> " + dstName + 
-                                    " = " + Convert.round(kb / sec, 2) + " KB/s");
+                            String f = "Bandwidth %1$s -> %2$s = %3$.2f KB/s";
+                            logger.info(String.format(f, srcName, dstName, kb / sec));
                         } else if (meDst) {
                             // warmup
                             receive(rport, BANDWIDTH_PROBE, BANDWIDTH_WARMUP_TIMES);
