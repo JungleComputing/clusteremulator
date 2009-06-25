@@ -166,7 +166,7 @@ public class ApplicationRunner {
         logger.info("Entering barrier ...");
         System.setProperty("ibis.pool.size", "" + pool.size());
         System.setProperty("ibis.pool.name", "barrier_" + System.getProperty("ibis.pool.name"));
-        pool = PoolInfoClient.create();
+        PoolInfoClient.create();
         logger.info("Exiting barrier ...");
     }
 }
