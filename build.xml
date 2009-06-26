@@ -1,6 +1,6 @@
 <project name="ClusterEmulator" basedir="." default="build">
 
-    <property name="version" value="0.1"/>
+    <property name="version" value="0.1.1"/>
     <property name="jarfile" value="clusteremulator-${version}.jar"/>
     <property name="srcdir" value="src"/>
     <property name="builddir" value="build"/>
