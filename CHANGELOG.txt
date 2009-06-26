@@ -1,0 +1,9 @@
+Cluster emulator versions:
+--------------------------
+
+26-06-2006: Version 0.1.1
+  Fixed the property 'ibis.location', which did not always match the actual 
+  virtual cluster layout due to re-initialization of the PoolInfo class.
+
+10-03-2009: Version 0.1
+  First standalone version
